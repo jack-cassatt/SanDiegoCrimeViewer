@@ -1,7 +1,6 @@
 package crimeApplication;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Lead Author(s):
@@ -17,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class Crime
 {
 	// instance variables
+	private String dataLine;
 	private int caseID;
 	private LocalDateTime date;
 	private String category;
@@ -25,10 +25,22 @@ public class Crime
 	private double latitude;
 	private double longitude;
 	
-	// Constructor with parameters
-	public Crime(int caseID, LocalDateTime date, String category, String description,
+	/**
+	 * Constructor
+	 * 
+	 * @param dataLine
+	 * @param caseID
+	 * @param date
+	 * @param category
+	 * @param description
+	 * @param areaCode
+	 * @param latitude
+	 * @param longitude
+	 */
+	public Crime(String dataLine, int caseID, LocalDateTime date, String category, String description,
 			int areaCode, double latitude, double longitude)
 	{
+		this.dataLine = dataLine;
 		this.caseID = caseID;
 		this.date = date;
 		this.category = category;
@@ -101,6 +113,17 @@ public class Crime
 		return longitude;
 	}
 	
+	/**
+	 * Purpose: Get the data line
+	 * 
+	 * @return dataLine
+	 */
+	public String getDataLine()
+	{
+		return dataLine;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return "Case ID: " + caseID + "; Date: " + date + "; Category: "

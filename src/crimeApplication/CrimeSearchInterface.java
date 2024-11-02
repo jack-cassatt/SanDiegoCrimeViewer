@@ -19,10 +19,12 @@ import java.time.format.DateTimeFormatter;
  */
 public class CrimeSearchInterface
 {
+	// Instance variables
 	CrimeMap crimeMap;
 	JButton searchButton;
 	JTextField startDateField;
 	JTextField endDateField;
+	// Checkboxes for crime categories
 	JCheckBox[] crimeCategoryCheckBoxes =
 	{
 		new JCheckBox("All Crimes"),
@@ -47,6 +49,7 @@ public class CrimeSearchInterface
 		new JCheckBox("Vandalism"),
 		new JCheckBox("Weapon Law Violations")
 	};
+	// Checkboxes for area codes
 	JCheckBox[] areaCodeCheckBoxes =
 	{
 		new JCheckBox("All Area Codes"), 
@@ -100,8 +103,9 @@ public class CrimeSearchInterface
 		new JCheckBox("92182"),       
 	};
 	
-	
-    
+	/**
+	 * Constructor
+	 */
 	CrimeSearchInterface()
 	{
 		crimeMap = new CrimeMap();
@@ -111,15 +115,23 @@ public class CrimeSearchInterface
 		endDateField = new JTextField();
 	}
 	
+	/**
+	 * Purpose: Get the selected crime categories 
+	 * 
+	 * @return List<String> crime categories
+	 */
 	public List<String> getCrimeCategories()
 	{
+		// Create a list to hold the selected crime categories
 		List<String> selectedCrimeCategories = new ArrayList<String>();
+		
 		// If the "All Crimes" checkbox is selected, add "All Crimes" to the list and return
 		if (crimeCategoryCheckBoxes[0].isSelected())
 		{
 			selectedCrimeCategories.add("All Crimes");
 			return selectedCrimeCategories;
 		}
+		
 		// Skip the first checkbox because it is the "All Crimes" checkbox
 		for (int i = 1; i < crimeCategoryCheckBoxes.length; i++)
 		{
@@ -129,11 +141,19 @@ public class CrimeSearchInterface
 				selectedCrimeCategories.add(crimeCategoryCheckBoxes[i].getText());
 			}
 		}
+		
+		// Return the list of selected crime categories
 		return selectedCrimeCategories;
 	}
 	
+	/**
+	 * Purpose: Get the selected area codes
+	 * 
+	 * @return List<Integer> area codes
+	 */
 	public List<Integer> getAreaCodes()
 	{
+		// Create a list to hold the selected area codes
 		List<Integer> selectedAreaCodes = new ArrayList<Integer>();
 		// If the "All Area Codes" checkbox is selected, add 0 to the list and return
 		if (areaCodeCheckBoxes[0].isSelected())
@@ -141,6 +161,7 @@ public class CrimeSearchInterface
 			selectedAreaCodes.add(0);
 			return selectedAreaCodes;
 		}
+		
 		// Skip the first checkbox because it is the "All Area Codes" checkbox
 		for (int i = 1; i < areaCodeCheckBoxes.length; i++)
 		{
@@ -150,11 +171,19 @@ public class CrimeSearchInterface
 				selectedAreaCodes.add(Integer.parseInt(areaCodeCheckBoxes[i].getText()));
 			}
 		}
+		
+		// Return the list of selected area	codes
 		return selectedAreaCodes;
 	}
 	
+	/**
+	 * Purpose: Get the start date from the text field
+	 * 
+	 * @return startDate
+	 */
 	public LocalDateTime getStartDate()
 	{
+		// NEEDS TO BE IMPLEMENTED TO USE OF METHOD
 		String date = startDateField.getText().replace("/", "-");
 		try
 		{
@@ -168,8 +197,14 @@ public class CrimeSearchInterface
 		}
 	}
 	
+	/**
+	 * Purpose: Get the end date from the text field
+	 * 
+	 * @return endDate
+	 */
 	public LocalDateTime getEndDate()
 	{
+		// NEEDS TO BE IMPLEMENTED TO USE OF METHOD
 		String date = endDateField.getText().replace("/", "-");
 		try
 		{
@@ -200,9 +235,9 @@ public class CrimeSearchInterface
 		SearchCriteria searchCriteria = new SearchCriteria(startDate, endDate, selectedCategories, areaCodes);
 		CSVCrimeDataParser parser = new CSVCrimeDataParser();
 		ArrayList<Crime> crimes = parser.searchCrimes(searchCriteria);
-//		for (Crime crime : crimes)
-//		{
-//			System.out.println(crime.toString());
-//		}
+		for (Crime crime : crimes)
+		{
+			System.out.println(crime.toString());
+		}
 	}
 }

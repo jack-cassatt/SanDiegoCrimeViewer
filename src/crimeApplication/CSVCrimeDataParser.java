@@ -3,7 +3,6 @@ package crimeApplication;
 import java.io.*;
 import java.util.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Lead Author(s):
@@ -20,35 +19,54 @@ import java.time.format.DateTimeFormatter;
  */
 public class CSVCrimeDataParser
 {
+	// String to hold the file name
 	private String fileName;
 	
+	/**
+	 * Constructor
+	 */
 	public CSVCrimeDataParser()
 	{
+		// Set the file name
 		this.fileName = "pd_nibrs_datasd.csv";
 	}
 
+	/**
+	 * Purpose: Search for crimes based on search criteria
+	 * 
+	 * @param searchCriteria
+	 * @return ArrayList<Crime>
+	 */
 	public ArrayList<Crime> searchCrimes(SearchCriteria searchCriteria)
 	{
+		// Create an array list to hold the crimes
 		ArrayList<Crime> crimes = new ArrayList<Crime>();
+		// Create a buffered reader
 		BufferedReader reader = null;
-		// read the file
+		
+		// Try to read the file
 		try
 		{
+			// Create a buffered reader to read
 			reader = new BufferedReader(new FileReader(fileName));
 			// Declare a string to hold the line and skip the first line
 			String line;
-			// Loop through CSV file and skip the first line
+			
+			// Skip the first line and loop through CSV file
 			reader.readLine();
 			while ((line = reader.readLine()) != null)
 			{
+				// Create a string to hold the raw data
+				String crimeLine = line;
+				
 				// Create array of string holding values in line separated by comma
 				String[] fields = line.split(",");
+				
+				// Check if the line is valid
 				if (fields.length != 31)
                 {
 					continue;
                 }
-                    
-				// Get Crime field variables
 				
 				// Try to parse the caseID
 				int caseID;
@@ -76,10 +94,12 @@ public class CSVCrimeDataParser
 					date = null;
 					continue;
 				}
+				
+				// Get the crime category and description
 				String category = fields[14];
-				//System.out.println(category);
 				String description = fields[13];
 				
+				// Try to parse the area code
 				int areaCode;
 				try
                 {
@@ -104,14 +124,20 @@ public class CSVCrimeDataParser
 					longitude = -1;
 					continue;
 				}
-				Crime crime = new Crime(caseID, date, category, description, areaCode,
+				
+				// Create a new crime object
+				Crime crime = new Crime(crimeLine, caseID, date, category, description, areaCode,
 						latitude, longitude);
+				
+				// Check if the crime matches the search criteria
 				if (searchCriteria.match(crime))
 				{
+					// Add the crime to the list of search results
 					crimes.add(crime);
 				}
 			}
 		}
+		// Catch exceptions
 		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
@@ -120,6 +146,7 @@ public class CSVCrimeDataParser
         {
             System.out.println("Error reading file: " + e.getMessage());
         }
+		// Close the reader
 		finally
 		{
 			if (reader != null)
@@ -134,6 +161,8 @@ public class CSVCrimeDataParser
 				}
 			}
 		}
+		
+		// Return the list of crimes
 		return crimes;
 	}
 }

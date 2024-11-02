@@ -19,11 +19,20 @@ import java.util.List;
  */
 public class SearchCriteria
 {
+	// Instance variables - search criteria
 	private List<String> categories;
 	private LocalDateTime startDate;
 	private LocalDateTime endDate;
 	private List<Integer> areaCodes;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param startDate
+	 * @param endDate
+	 * @param categories
+	 * @param areaCode
+	 */
 	public SearchCriteria(LocalDateTime startDate, LocalDateTime endDate,
 			List<String> categories, List<Integer> areaCode)
 	{
@@ -48,11 +57,6 @@ public class SearchCriteria
 			return false;
 		}
 		
-		if (areaCodes.contains(0))
-		{
-			System.out.println("Area contain all area codes");
-		}
-		
 		// Check if the crime area code is in the list of area codes
 		if (!areaCodes.contains(crime.getAreaCode()) && !areaCodes.contains(0))
 		{
@@ -63,18 +67,20 @@ public class SearchCriteria
 		// Check if the crime category is in the list of categories
 		if (!categories.contains("All Crimes"))
 		{
+			// Loop through the list of selected categories
 			for (String category : categories)
 			{
+				// If the selected category is in the list of categories, return true
+				// (Category names are shortened versions of the full category names)
 				if (category.contains(crime.getCategory()))
 				{
-					System.out.println(crime.toString());
 					return true;
 				}
 			}
-			//System.out.println("Fail: " + crime.getCategory() + " is not in the list of categories");
-			//System.out.println(crime.toString());
+			// If the category is not in the list of selected categories, return false
 			return false;
 		}
+		// If the category is "All Crimes", return true
 		else
 		{
 			return true;
