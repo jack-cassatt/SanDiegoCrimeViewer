@@ -30,14 +30,13 @@ public class CrimeMap
 	public CrimeMap()
 	{
 		markers = new ArrayList<MapMarker>();
-		mapImage = new Image("Map.png");
 	}
 	
 	public void displayCrimes(ArrayList<Crime> crimes)
 	{
 		for (Crime crime : crimes)
 		{
-			MapMarker marker = new MapMarker(crime);
+			MapMarker marker = new MapMarker(crime, this);
 			markers.add(marker);
 			plotMarker(marker);
 		}
@@ -45,20 +44,39 @@ public class CrimeMap
 	
 	public void plotMarker(MapMarker marker)
 	{
-		int x = marker.getX();
-		int y = marker.getY();
+		// Plot the marker on the map using the x and y coordinates
 	}
-
 	
-	public int getWidth(ImageObserver observer)
+	public int getWidth()
 	{
 		return IMAGE_WIDTH;
 	}
 
 	
-	public int getHeight(ImageObserver observer)
+	public int getHeight()
 	{
 		// TODO Auto-generated method stub
 		return IMAGE_HEIGHT;
 	}
+	
+	int getLatitudeTop()
+	{
+		return (int) LATITUDE_TOP;
+	}
+	
+	int getLatitudeBottom()
+	{
+		return (int) LATITUDE_BOTTOM;
+	}
+	
+	int getLongitudeLeft()
+	{
+		return (int) LONGITUDE_LEFT;
+	}
+	
+	int getLongitudeRight()
+	{
+		return (int) LONGITUDE_RIGHT;
+	}
+	
 }

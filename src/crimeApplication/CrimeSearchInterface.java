@@ -125,6 +125,7 @@ public class CrimeSearchInterface
 		{
 			if (crimeCategoryCheckBoxes[i].isSelected())
 			{
+				System.out.println(crimeCategoryCheckBoxes[i].getText() + " is selected");
 				selectedCrimeCategories.add(crimeCategoryCheckBoxes[i].getText());
 			}
 		}
@@ -180,5 +181,28 @@ public class CrimeSearchInterface
 			System.out.println("Invalid date format:" + date);
 			return null;
 		}
+	}
+	
+	public static void main(String[] args)
+	{
+		CrimeSearchInterface searchInterface = new CrimeSearchInterface();
+		LocalDateTime startDate = LocalDateTime.of(2023, 9, 1, 0, 0, 0);
+		LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
+		for (int i = 1; i < searchInterface.crimeCategoryCheckBoxes.length; i += 5)
+		{
+			searchInterface.crimeCategoryCheckBoxes[i].setSelected(true);
+		}
+		List<String> selectedCategories = searchInterface.getCrimeCategories();
+		List<Integer> areaCodes = new ArrayList<Integer>();
+		areaCodes.add(92101);
+		System.out.println("Selected categories: " + selectedCategories);
+		System.out.println("Selected area codes: " + areaCodes);
+		SearchCriteria searchCriteria = new SearchCriteria(startDate, endDate, selectedCategories, areaCodes);
+		CSVCrimeDataParser parser = new CSVCrimeDataParser();
+		ArrayList<Crime> crimes = parser.searchCrimes(searchCriteria);
+//		for (Crime crime : crimes)
+//		{
+//			System.out.println(crime.toString());
+//		}
 	}
 }
