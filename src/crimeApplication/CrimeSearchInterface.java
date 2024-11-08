@@ -5,26 +5,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+
+/**
+ * NOTES:
+ * Crimes not showing up:
+ * Drug Violations
+ * Curfew/Loitering
+ * Vehicle Theft
+ * 91978
+ * 
+ * Add map marker click to display crime details
+ */
 
 /**
  * Lead Author(s):
  * @author Jack Cassatt
  * 
  * References:
+ * Oracle Java Documentation - DocumentListener
+ * https://docs.oracle.com/javase/tutorial/uiswing/events/documentlistener.html
+ * 
+ * Oracle Java Documentation - BoxLayout
+ * https://docs.oracle.com/javase/tutorial/uiswing/layout/box.html
+ * 
+ * Oracle Java Documentation - JScrollPane
+ * https://docs.oracle.com/javase/tutorial/uiswing/components/scrollpane.html
+ * 
+ * Oracle Java Documentation - FocusListener
+ * https://docs.oracle.com/javase/tutorial/uiswing/events/focuslistener.html
  * 
  * Version/date: v.1 01NOV2024
  * 
  * Responsibilities of class:
  * The primary interface for searching for crimes
  */
-public class CrimeSearchInterface
+public class CrimeSearchInterface extends JFrame implements ActionListener
 {
 	// Instance variables
 	CrimeMap crimeMap;
+	JLabel title;
 	JButton searchButton;
+	JButton zoomInButton;
+	JButton zoomOutButton;
 	JTextField startDateField;
 	JTextField endDateField;
-	// Checkboxes for crime categories
+	// Check boxes for crime categories
 	JCheckBox[] crimeCategoryCheckBoxes =
 	{
 		new JCheckBox("All Crimes"),
@@ -49,7 +81,7 @@ public class CrimeSearchInterface
 		new JCheckBox("Vandalism"),
 		new JCheckBox("Weapon Law Violations")
 	};
-	// Checkboxes for area codes
+	// Check boxes for area codes
 	JCheckBox[] areaCodeCheckBoxes =
 	{
 		new JCheckBox("All Area Codes"), 
@@ -107,12 +139,139 @@ public class CrimeSearchInterface
 	 * Constructor
 	 */
 	CrimeSearchInterface()
-	{
+	{			
+		// Establish the layout of the interface
+		this.setTitle("San Diego Crime Search Application");
+		this.setSize(1100, 800);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setForeground(Color.CYAN);
+		//this.setResizable(false);
+		this.setLayout(new BorderLayout());
+		
+		// Create a panel for the title
+		JPanel titlePanel = new JPanel();
+		title = new JLabel("San Diego Crime Search Application");
+		title.setFont(new Font("Serif", Font.BOLD, 50));
+		titlePanel.add(title);
+		this.add(titlePanel, BorderLayout.NORTH);
+		
+		// Create panel for map and date
+		JPanel mapDatePanel = new JPanel();
+		mapDatePanel.setLayout(new BoxLayout(mapDatePanel, BoxLayout.Y_AXIS));
+		mapDatePanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+		
+		// Create date panel
+		JPanel datePanel = new JPanel();
+		datePanel.setLayout(new GridLayout(2, 6, 10, 7));
+		datePanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 10));
+		// Create Labels for date fields to show error
+		JLabel startDateLabel = new JLabel("Start Date:");
+		startDateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		JLabel startDateErrorLabel = new JLabel("MM/DD/YYYY");
+		startDateErrorLabel.setForeground(Color.RED);
+		startDateErrorLabel.setVisible(false);
+		JLabel endDateLabel = new JLabel("End Date:");
+		endDateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		JLabel endDateErrorLabel = new JLabel("MM/DD/YYYY");
+		endDateErrorLabel.setForeground(Color.RED);
+		endDateErrorLabel.setVisible(false);
+		// Create text fields for start and end date
+		startDateField = new JTextField("01/01/2022");
+		startDateField.setColumns(11);
+		endDateField = new JTextField("01/01/2023");
+		endDateField.setColumns(11);
+		endDateField.setHorizontalAlignment(SwingConstants.LEFT);
+		// Add document listener to date fields
+		startDateField.getDocument().addDocumentListener(new DateFieldListener(startDateField, startDateErrorLabel));
+		endDateField.getDocument().addDocumentListener(new DateFieldListener(endDateField, endDateErrorLabel));
+		// Add labels and fields to date panel
+		// Create zoom panel
+		JPanel zoomPanel = new JPanel();
+		zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
+		zoomInButton = new JButton("+");
+		zoomInButton.addActionListener(this);
+		zoomOutButton = new JButton("-");
+		zoomOutButton.addActionListener(this);
+		zoomPanel.add(zoomOutButton);
+		zoomPanel.add(zoomInButton);
+		datePanel.add(new JLabel());
+		datePanel.add(new JLabel());
+		datePanel.add(startDateErrorLabel);
+		datePanel.add(new JLabel());
+		datePanel.add(endDateErrorLabel);
+		datePanel.add(new JLabel());
+		datePanel.add(zoomPanel);
+		datePanel.add(startDateLabel);
+		datePanel.add(startDateField);
+		datePanel.add(endDateLabel);
+		datePanel.add(endDateField);
+		datePanel.add(new JLabel());
+		// Add date panel to map date panel
+		mapDatePanel.add(datePanel);
+		
+		// Add map panel to map date panel
 		crimeMap = new CrimeMap();
+		JScrollPane crimeMapScrollPane = new JScrollPane(crimeMap);
+		crimeMapScrollPane.setPreferredSize(crimeMap.getPreferredSize(600));
+		crimeMapScrollPane.setViewportView(crimeMap);
+		JScrollBar mapVerticalScrollSpeed = crimeMapScrollPane.getVerticalScrollBar();
+		mapVerticalScrollSpeed.setUnitIncrement(16);
+		JScrollBar mapHorizontalScrollSpeed = crimeMapScrollPane.getHorizontalScrollBar();
+		mapHorizontalScrollSpeed.setUnitIncrement(16);
+		mapDatePanel.add(crimeMapScrollPane);
+		// Add map date panel to frame
+		this.add(mapDatePanel, BorderLayout.CENTER);
+		
+		// Create panel for search options
+		JPanel searchPanel = new JPanel();
+		// Add space border to search panel
+		searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
+		// Scroll pane for crime categories
+		JScrollPane crimeCategoryScrollPane = new JScrollPane();
+		crimeCategoryScrollPane.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 20));
+		crimeCategoryScrollPane.setPreferredSize(new Dimension(180, 170));
+		JScrollBar crimeScrollSpeed = crimeCategoryScrollPane.getVerticalScrollBar();
+		crimeScrollSpeed.setUnitIncrement(16);
+		// Add crime category check boxes to the scroll pane
+		JPanel crimeCategoryPanel = new JPanel();
+		crimeCategoryPanel.setLayout(new BoxLayout(crimeCategoryPanel, BoxLayout.Y_AXIS));
+		crimeCategoryCheckBoxes[0].setSelected(true);
+		for (JCheckBox checkBox : crimeCategoryCheckBoxes)
+		{
+			crimeCategoryPanel.add(checkBox);
+		}
+		crimeCategoryScrollPane.setViewportView(crimeCategoryPanel);
+		// Add crime category scroll pane to search panel
+		searchPanel.add(crimeCategoryScrollPane);
+		
+		// Scroll pane for area codes
+		JScrollPane areaCodeScrollPane = new JScrollPane(); 
+		areaCodeScrollPane.setPreferredSize(new Dimension(150, 170));
+		areaCodeScrollPane.setBorder(BorderFactory.createEmptyBorder(50, 0, 20, 20));
+		JScrollBar areaCodeScrollSpeed = areaCodeScrollPane.getVerticalScrollBar();
+		areaCodeScrollSpeed.setUnitIncrement(16);
+		// Add area code check boxes to the scroll pane
+		JPanel areaCodePanel = new JPanel();
+		areaCodePanel.setLayout(new BoxLayout(areaCodePanel, BoxLayout.Y_AXIS));
+		areaCodeCheckBoxes[0].setSelected(true);
+		for (JCheckBox checkBox : areaCodeCheckBoxes)
+		{
+			areaCodePanel.add(checkBox);
+		}
+		areaCodeScrollPane.setViewportView(areaCodePanel);
+		searchPanel.add(areaCodeScrollPane);
+		// Add search panel to frame
+		this.add(searchPanel, BorderLayout.EAST);
+		
+		// Add search button to search panel
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(new SearchButtonListener(this, crimeMap));
-		startDateField = new JTextField();
-		endDateField = new JTextField();
+		searchPanel.add(searchButton);
+	
+		this.setVisible(true);
+		
 	}
 	
 	/**
@@ -125,14 +284,14 @@ public class CrimeSearchInterface
 		// Create a list to hold the selected crime categories
 		List<String> selectedCrimeCategories = new ArrayList<String>();
 		
-		// If the "All Crimes" checkbox is selected, add "All Crimes" to the list and return
+		// If the "All Crimes" check box is selected, add "All Crimes" to the list and return
 		if (crimeCategoryCheckBoxes[0].isSelected())
 		{
 			selectedCrimeCategories.add("All Crimes");
 			return selectedCrimeCategories;
 		}
 		
-		// Skip the first checkbox because it is the "All Crimes" checkbox
+		// Skip the first check box because it is the "All Crimes" check box
 		for (int i = 1; i < crimeCategoryCheckBoxes.length; i++)
 		{
 			if (crimeCategoryCheckBoxes[i].isSelected())
@@ -162,7 +321,7 @@ public class CrimeSearchInterface
 			return selectedAreaCodes;
 		}
 		
-		// Skip the first checkbox because it is the "All Area Codes" checkbox
+		// Skip the first check box because it is the "All Area Codes" checkbox
 		for (int i = 1; i < areaCodeCheckBoxes.length; i++)
 		{
 			// If the checkbox is selected, add the area code integer to the list
@@ -183,20 +342,9 @@ public class CrimeSearchInterface
 	 */
 	public LocalDateTime getStartDate()
 	{
-		// NEEDS TO BE IMPLEMENTED TO USE OF METHOD
-		String date = startDateField.getText().replace("/", "-");
-		try
-		{
-			return LocalDateTime.parse(date,
-					DateTimeFormatter.ofPattern("MM-dd-yyyy"));
-		}
-		catch (Exception e)
-		{
-			System.out.println("Invalid date format:" + date );
-			return null;
-		}
+		return parseDate(startDateField.getText());
 	}
-	
+		
 	/**
 	 * Purpose: Get the end date from the text field
 	 * 
@@ -204,40 +352,183 @@ public class CrimeSearchInterface
 	 */
 	public LocalDateTime getEndDate()
 	{
-		// NEEDS TO BE IMPLEMENTED TO USE OF METHOD
-		String date = endDateField.getText().replace("/", "-");
+		return parseDate(endDateField.getText());
+	}
+	
+	/**
+	 * Purpose: Parse the date from string "MM/DD/YYYY" to LocalDateTime
+	 * 
+	 * @param date
+	 * @return LocalDateTime
+	 */
+	private LocalDateTime parseDate(String date)
+	{
+		String[] dateParts = date.split("/");
 		try
 		{
-			return LocalDateTime.parse(date,
-					DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+			return LocalDateTime.of(Integer.parseInt(dateParts[2]),
+					Integer.parseInt(dateParts[0]),
+					Integer.parseInt(dateParts[1]), 0, 0);
 		}
 		catch (Exception e)
 		{
-			System.out.println("Invalid date format:" + date);
+			JOptionPane.showMessageDialog(this, "Invalid date format:" + date);
 			return null;
 		}
 	}
 	
 	public static void main(String[] args)
 	{
-		CrimeSearchInterface searchInterface = new CrimeSearchInterface();
-		LocalDateTime startDate = LocalDateTime.of(2023, 9, 1, 0, 0, 0);
-		LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
-		for (int i = 1; i < searchInterface.crimeCategoryCheckBoxes.length; i += 5)
+		new CrimeSearchInterface();
+	}
+	
+	/*
+	 * Purpose: Listener for the date fields to validate the date
+	 */
+	public class DateFieldListener implements DocumentListener //, FocusListener
+	{
+		JTextField dateField;
+		JLabel errorLabel;
+		
+		public DateFieldListener(JTextField dateField, JLabel errorLabel)
 		{
-			searchInterface.crimeCategoryCheckBoxes[i].setSelected(true);
+			this.dateField = dateField;
+			this.errorLabel = errorLabel;
 		}
-		List<String> selectedCategories = searchInterface.getCrimeCategories();
-		List<Integer> areaCodes = new ArrayList<Integer>();
-		areaCodes.add(92101);
-		System.out.println("Selected categories: " + selectedCategories);
-		System.out.println("Selected area codes: " + areaCodes);
-		SearchCriteria searchCriteria = new SearchCriteria(startDate, endDate, selectedCategories, areaCodes);
-		CSVCrimeDataParser parser = new CSVCrimeDataParser();
-		ArrayList<Crime> crimes = parser.searchCrimes(searchCriteria);
-		for (Crime crime : crimes)
+		
+		@Override
+		public void insertUpdate(DocumentEvent e)
 		{
-			System.out.println(crime.toString());
+			validateDate();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e)
+		{
+			validateDate();
+        }
+
+		@Override
+		public void changedUpdate(DocumentEvent e)
+		{
+			validateDate();
+		}
+		
+		private void validateDate()
+		{		
+			// If the date is longer than 10 characters, show error
+			if (dateField.getText().length() > 10)
+			{
+				dateField.setForeground(Color.RED);
+				errorLabel.setVisible(true);
+				return;
+			}
+			// Otherwise, check date
+			else
+			{
+				// Split string by "/"
+				String[] dateParts = dateField.getText().split("/");
+				// Verify all parts are numbers
+				for (String part : dateParts)
+				{
+					try
+					{
+						Integer.parseInt(part);
+					}
+					catch (Exception e)
+					{
+						dateField.setForeground(Color.RED);
+						errorLabel.setVisible(true);
+						return;
+					}
+				}
+				// Check month is valid
+				int month = Integer.parseInt(dateParts[0]);
+				if (dateParts[0].length() > 2)
+				{
+					dateField.setForeground(Color.RED);
+					errorLabel.setVisible(true);
+					return;					
+				}
+				else if (month > 12 || month < 1)
+				{
+					dateField.setForeground(Color.RED);
+					errorLabel.setVisible(true);
+					return;
+				}
+				// If there is a day, check it is valid
+				if (dateParts.length > 1)
+				{
+					int day = Integer.parseInt(dateParts[1]);
+					if (dateParts[1].length() > 2)
+					{
+						dateField.setForeground(Color.RED);
+						errorLabel.setVisible(true);
+						return;					
+					}
+					else if ((month == 1 || month == 3 || month == 5 || month == 7
+							|| month == 8 || month == 10 || month == 12)
+							&& (day < 1 || day > 31))
+					{
+						dateField.setForeground(Color.RED);
+						errorLabel.setVisible(true);
+						return;
+					}
+					else if ((month == 4 || month == 6 || month == 9 || month == 11)
+                            && (day < 1 || day > 30))
+                    {
+                        dateField.setForeground(Color.RED);
+        				errorLabel.setVisible(true);
+                        return;
+                    }
+                    else if (month == 2 && (day < 1 || day > 29))
+					{
+						dateField.setForeground(Color.RED);
+						errorLabel.setVisible(true);
+						return;
+					}
+				}
+				// If there is a year, check it is valid
+				if (dateParts.length > 2)
+				{
+					int year = Integer.parseInt(dateParts[2]);
+					// Do not show error if user is still entering date
+					if (dateParts[2].length() < 4)
+					{
+						dateField.setForeground(Color.BLACK);
+						errorLabel.setVisible(false);
+					}
+					else if (year < 2000 || year > 2024)
+					{
+						dateField.setForeground(Color.RED);
+						errorLabel.setVisible(true);
+						return;
+					}
+				}
+				// If there are more than 3 parts, show error
+				if (dateParts.length > 3)
+				{
+					dateField.setForeground(Color.RED);
+					errorLabel.setVisible(true);
+					return;
+				}
+				// If all checks pass, set text to black
+				dateField.setForeground(Color.BLACK);	
+				errorLabel.setVisible(false);
+			}
+			
+		}
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		if (e.getSource() == zoomInButton)
+		{
+			crimeMap.zoomIn();
+		}
+		else if (e.getSource() == zoomOutButton)
+		{
+			crimeMap.zoomOut();
 		}
 	}
 }

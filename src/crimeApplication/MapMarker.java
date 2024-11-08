@@ -15,6 +15,7 @@ public class MapMarker
 {
 	// MapMarker has a Crime
 	private Crime crime;
+	// 
 	private CrimeMap map;
 	private int x;
 	private int y;
@@ -29,9 +30,9 @@ public class MapMarker
 	}
 	
 	public void setImageCoordinates()
-	{
-		x = (int) ((crime.getLongitude() - map.getLongitudeLeft()) / (map.getLongitudeLeft() - map.getLongitudeRight()) * map.getWidth());
-		y = (int) ((crime.getLatitude() - map.getLatitudeBottom() ) / (map.getLatitudeTop() - map.getLatitudeBottom()) * map.getHeight());
+	{		
+		x = (int) (((crime.getLongitude() - map.getLongitudeLeft()) / (map.getLongitudeRight() - map.getLongitudeLeft())) * map.getWidth());
+		y = (int) (((map.getLatitudeTop() - crime.getLatitude()) / (map.getLatitudeTop() - map.getLatitudeBottom())) * map.getHeight());
 	}
 	
 	public int getX()
