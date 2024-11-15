@@ -20,6 +20,12 @@ import java.awt.event.*;
  * Oracle Java Documentation - JPanel (paintComponent)
  * https://docs.oracle.com/javase/8/docs/api/javax/swing/JComponent.html#paintComponent-java.awt.Graphics-
  * 
+ * Oracle Java Documentation - MouseListener
+ * https://docs.oracle.com/javase/tutorial/uiswing/events/mouselistener.html
+ * 
+ * Oracle Java Documentation - MouseAdapter
+ * https://docs.oracle.com/javase/8/docs/api/java/awt/event/MouseAdapter.html
+ * 
  * Version/date: v.1 01NOV2024
  * 
  * Responsibilities of class:
@@ -42,6 +48,11 @@ public class CrimeMap extends JPanel
 	JButton zoomInButton;
 	JButton zoomOutButton;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param frame
+	 */
 	public CrimeMap(CrimeSearchInterface frame)
 	{
 		this.frame = frame;
@@ -66,11 +77,20 @@ public class CrimeMap extends JPanel
         });
 	}
 	
+	/**
+	 * Purpose: Get the height of the panel
+	 * @return panelHeight
+	 */
 	public int getPanelHeight()
     {
         return panelHeight;
     }
 	
+	/**
+	 * Purpose: Get the preferred size of the panel
+	 * @param panelHeight
+	 * @return Dimension
+	 */
 	public Dimension getPreferredSize(int panelHeight)
     {
         this.panelHeight = panelHeight;
@@ -78,6 +98,10 @@ public class CrimeMap extends JPanel
         return new Dimension(panelWidth, panelHeight);
     }
 	
+	/**
+	 * Purpose: Display crimes on the map
+	 * @param crimes
+	 */
 	public void displayCrimes(ArrayList<Crime> crimes)
 	{
 		this.crimes = crimes;
@@ -92,6 +116,10 @@ public class CrimeMap extends JPanel
 		}
 	}
 	
+	/**
+	 * Purpose: Get the width of the image
+	 * @return width
+	 */
 	public int getImageWidth()
 	{
 		double panelRatio = this.getHeight() / (double) this.getWidth();
@@ -105,32 +133,54 @@ public class CrimeMap extends JPanel
 		}
 	}
 
-	
+	/**
+	 * Purpose: Get the height of the image
+	 * @return height
+	 */
 	public int getImageHeight()
 	{
 		return (int) (getImageWidth() * IMAGE_RATIO);
 	}
 	
+	/**
+	 * Purpose: Get the top latitude
+	 * @return LATITUDE_TOP
+	 */
 	public double getLatitudeTop()
 	{
 		return LATITUDE_TOP;
 	}
 	
+	/**
+	 * Purpose: Get the bottom latitude
+	 * @return LATITUDE_BOTTOM
+	 */
 	public double getLatitudeBottom()
 	{
 		return LATITUDE_BOTTOM;
 	}
 	
+	/**
+	 * Purpose: Get the left longitude
+	 * @return LONGITUDE_LEFT
+	 */
 	public double getLongitudeLeft()
 	{
 		return LONGITUDE_LEFT;
 	}
 	
+	/**
+	 * Purpose: Get the right longitude
+	 * @return LONGITUDE_RIGHT
+	 */
 	public double getLongitudeRight()
 	{
 		return LONGITUDE_RIGHT;
 	}
 	
+	/**
+	 * Purpose: Clear the map of markers
+	 */
 	public void clearMap()
 	{
 		markers.clear();
@@ -157,6 +207,12 @@ public class CrimeMap extends JPanel
 		}	
 	}
 	
+	/**
+	 * Purpose: Display the crime information
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 */
 	protected void displayCrime(int mouseX, int mouseY) {
 		// Check if a marker was clicked
         for (MapMarker marker : markers) 
