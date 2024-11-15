@@ -8,21 +8,9 @@ import java.time.format.DateTimeFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
-/**
- * NOTES:
- * Crimes not showing up:
- * Drug Violations
- * Curfew/Loitering
- * Vehicle Theft
- * 91978
- * 
- * Add map marker click to display crime details
- */
 
 /**
  * Lead Author(s):
@@ -56,6 +44,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 	JButton zoomOutButton;
 	JTextField startDateField;
 	JTextField endDateField;
+	JTextArea crimeText;
 	// Check boxes for crime categories
 	JCheckBox[] crimeCategoryCheckBoxes =
 	{
@@ -66,7 +55,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		new JCheckBox("Burglary/Breaking & Entering"),
 		new JCheckBox("Curfew/Loitering"),
 		new JCheckBox("Disorderly Conduct"),
-		new JCheckBox("Drug Violations"),
+		new JCheckBox("Drug/Narcotic Violations"),
 		new JCheckBox("Fraud/Counterfeiting"),
 		new JCheckBox("Gambling Violations"),
 		new JCheckBox("Homicide"),
@@ -211,9 +200,9 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		mapDatePanel.add(datePanel);
 		
 		// Add map panel to map date panel
-		crimeMap = new CrimeMap();
+		crimeMap = new CrimeMap(this);
 		JScrollPane crimeMapScrollPane = new JScrollPane(crimeMap);
-		crimeMapScrollPane.setPreferredSize(crimeMap.getPreferredSize(600));
+		crimeMapScrollPane.setPreferredSize(crimeMap.getPreferredSize(500));
 		crimeMapScrollPane.setViewportView(crimeMap);
 		JScrollBar mapVerticalScrollSpeed = crimeMapScrollPane.getVerticalScrollBar();
 		mapVerticalScrollSpeed.setUnitIncrement(16);
@@ -269,6 +258,18 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(new SearchButtonListener(this, crimeMap));
 		searchPanel.add(searchButton);
+		
+		// Add crime panel to frame
+		JPanel crimePanel = new JPanel();
+		crimePanel.setLayout(new BoxLayout(crimePanel, BoxLayout.X_AXIS));
+		crimePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		crimePanel.setPreferredSize(new Dimension(200, 90));
+		crimeText = new JTextArea();
+		crimeText.setEditable(false);
+		crimeText.setBackground(null);
+		crimePanel.add(crimeText);
+		this.add(crimePanel, BorderLayout.SOUTH);
+		
 	
 		this.setVisible(true);
 		
@@ -296,7 +297,6 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		{
 			if (crimeCategoryCheckBoxes[i].isSelected())
 			{
-				System.out.println(crimeCategoryCheckBoxes[i].getText() + " is selected");
 				selectedCrimeCategories.add(crimeCategoryCheckBoxes[i].getText());
 			}
 		}
@@ -377,6 +377,16 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		}
 	}
 	
+	public void displayCrime(Crime crime)
+	{
+		crimeText.setText("Date: " + crime.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + "\n"
+                + "Case ID: " + crime.getCaseID() + "\n"
+                + "Category: " + crime.getCategory() + "\n"
+                + "Description: " + crime.getDescription());
+				
+
+	}
+	
 	public static void main(String[] args)
 	{
 		new CrimeSearchInterface();
@@ -414,6 +424,9 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 			validateDate();
 		}
 		
+		/**
+		 * Purpose: Validate the date in the text field and show error if invalid
+		 */
 		private void validateDate()
 		{		
 			// If the date is longer than 10 characters, show error
@@ -524,11 +537,11 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 	{
 		if (e.getSource() == zoomInButton)
 		{
-			crimeMap.zoomIn();
+			crimeMap.zoom(50);
 		}
 		else if (e.getSource() == zoomOutButton)
 		{
-			crimeMap.zoomOut();
+			crimeMap.zoom(-50);
 		}
 	}
 }

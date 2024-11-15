@@ -72,7 +72,7 @@ public class SearchCriteria
 			{
 				// If the selected category is in the list of categories, return true
 				// (Category names are shortened versions of the full category names)
-				if (category.contains(crime.getCategory()))
+				if (crime.getCategory().contains(category))
 				{
 					return true;
 				}

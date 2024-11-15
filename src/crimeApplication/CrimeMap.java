@@ -7,8 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 /**
  * Lead Author(s):
@@ -28,7 +27,9 @@ import java.awt.event.ActionListener;
  */
 public class CrimeMap extends JPanel
 {
+	CrimeSearchInterface frame;
 	private ArrayList<MapMarker> markers;
+	private ArrayList<Crime> crimes;
 	private double LATITUDE_TOP = 32.8666;
 	private double LATITUDE_BOTTOM = 32.6625;
 	private double LONGITUDE_LEFT = -117.2825;
@@ -41,8 +42,9 @@ public class CrimeMap extends JPanel
 	JButton zoomInButton;
 	JButton zoomOutButton;
 	
-	public CrimeMap()
+	public CrimeMap(CrimeSearchInterface frame)
 	{
+		this.frame = frame;
 		this.setLayout(new BorderLayout());
 		markers = new ArrayList<MapMarker>();
 		setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
@@ -53,8 +55,21 @@ public class CrimeMap extends JPanel
         } catch (IOException e) {
             e.printStackTrace();
         }
-		this.setPreferredSize(getPreferredSize(600));
+		this.setPreferredSize(getPreferredSize(500));
+		
+		// Add mouse listener for marker clicks
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                displayCrime(e.getX(), e.getY());
+            }
+        });
 	}
+	
+	public int getPanelHeight()
+    {
+        return panelHeight;
+    }
 	
 	public Dimension getPreferredSize(int panelHeight)
     {
@@ -65,12 +80,16 @@ public class CrimeMap extends JPanel
 	
 	public void displayCrimes(ArrayList<Crime> crimes)
 	{
-		for (Crime crime : crimes)
-		{
-			MapMarker marker = new MapMarker(crime, this);
-			markers.add(marker);
+		this.crimes = crimes;
+		if (crimes != null)
+		{			
+			for (Crime crime : crimes)
+			{
+				MapMarker marker = new MapMarker(crime, this);
+				markers.add(marker);
+			}
+			repaint();
 		}
-		repaint();
 	}
 	
 	public int getImageWidth()
@@ -117,7 +136,45 @@ public class CrimeMap extends JPanel
 		markers.clear();
 		repaint();
 	}
+
+	/**
+	 * Purpose: Zoom on the map
+	 * @param zoom factor to increase/decrease the height of the panel
+	 */
+	public void zoom(int zoom)
+	{
+		// Do not zoom out past the original size of the map
+		if (panelHeight + zoom >= 500)
+		{
+			// Increase the height of the panel
+			panelHeight += zoom;
+			// Set the preferred size of the panel based on aspect ratio
+			this.setPreferredSize(getPreferredSize(panelHeight));
+			// Revalidate the panel and repaint
+			revalidate();
+			clearMap();
+			displayCrimes(crimes);
+		}	
+	}
 	
+	protected void displayCrime(int mouseX, int mouseY) {
+		// Check if a marker was clicked
+        for (MapMarker marker : markers) 
+        {
+        	// If the marker contains the mouse click, display the crime information
+            if (marker.contains(mouseX, mouseY)) 
+            {
+                // Action when a marker is clicked
+            	frame.displayCrime(marker.getCrime());
+            }
+        }
+    }
+	
+	/**
+	 * Purpose: Paint the map
+	 * 
+	 * @param g Graphics object
+	 */
 	protected void paintComponent(Graphics g) {
 		// Draw the map image
         super.paintComponent(g);
@@ -133,19 +190,5 @@ public class CrimeMap extends JPanel
 	        	g.fillOval(marker.getX(), marker.getY(), 10, 10);
 	        }
         }
-    }
-	
-	public void zoomIn()
-	{
-		panelHeight += 50;
-		this.setPreferredSize(getPreferredSize(panelHeight));
-		revalidate();
-	}
-	
-	public void zoomOut()
-	{
-		panelHeight -= 50;
-		this.setPreferredSize(getPreferredSize(panelHeight));
-		revalidate();
-	}
+    }	
 }
