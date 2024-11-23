@@ -35,11 +35,12 @@ public class SearchButtonListener implements ActionListener
     {
 		// Clear the map
 		map.clearMap();
+		searchInterface.displayCrimeDetails(null);
 		// Get the search criteria
 		LocalDateTime startDate = searchInterface.getStartDate();
 		LocalDateTime endDate = searchInterface.getEndDate();
 		// Check if the date range is valid
-		if ((startDate == null || endDate == null) || startDate.isAfter(endDate))
+		if ((startDate == null || endDate == null) || startDate.isAfter(endDate) || startDate.isBefore(LocalDateTime.of(2020, 1, 1, 0, 0)) || endDate.isAfter(LocalDateTime.now()))
 		{
 			JOptionPane.showMessageDialog(searchInterface, "Invalid date range");
 			return;

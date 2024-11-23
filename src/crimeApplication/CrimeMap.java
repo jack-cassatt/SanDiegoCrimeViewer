@@ -26,6 +26,9 @@ import java.awt.event.*;
  * Oracle Java Documentation - MouseAdapter
  * https://docs.oracle.com/javase/8/docs/api/java/awt/event/MouseAdapter.html
  * 
+ * Oracle Java Documentation - SwingUtilities (invokeLater)
+ * https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingUtilities.html
+ * 
  * Version/date: v.1 01NOV2024
  * 
  * Responsibilities of class:
@@ -104,14 +107,29 @@ public class CrimeMap extends JPanel
 	 */
 	public void displayCrimes(ArrayList<Crime> crimes)
 	{
+		// Set the crimes
 		this.crimes = crimes;
+		// If crimes are not null, add markers
 		if (crimes != null)
-		{			
-			for (Crime crime : crimes)
+		{
+			// If markers are empty (new search), add markers
+			// DisplayCrimes is also called on zoom, so we do not want to add markers again
+			if (markers.isEmpty())
 			{
-				MapMarker marker = new MapMarker(crime, this);
-				markers.add(marker);
+				for (Crime crime : crimes)
+				{
+					MapMarker marker = new MapMarker(crime, this);
+					markers.add(marker);
+				}
 			}
+			// Set the image coordinates for each marker after the panel is resized
+			SwingUtilities.invokeLater(() -> 
+			{
+	            for (MapMarker marker : markers) 
+	            {
+	                marker.setImageCoordinates(); // Update coordinates based on finalized dimensions
+	            }
+	        });
 			repaint();
 		}
 	}
@@ -213,7 +231,8 @@ public class CrimeMap extends JPanel
 	 * @param mouseX
 	 * @param mouseY
 	 */
-	protected void displayCrime(int mouseX, int mouseY) {
+	protected void displayCrime(int mouseX, int mouseY) 
+	{
 		// Check if a marker was clicked
         for (MapMarker marker : markers) 
         {
@@ -221,9 +240,12 @@ public class CrimeMap extends JPanel
             if (marker.contains(mouseX, mouseY)) 
             {
                 // Action when a marker is clicked
-            	frame.displayCrime(marker.getCrime());
+            	frame.displayCrimeDetails(marker.getCrime());
+            	return;
             }
         }
+        // If no marker was clicked, clear the crime information
+        frame.displayCrimeDetails(null);
     }
 	
 	/**
@@ -231,7 +253,8 @@ public class CrimeMap extends JPanel
 	 * 
 	 * @param g Graphics object
 	 */
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) 
+	{
 		// Draw the map image
         super.paintComponent(g);
         
@@ -243,6 +266,7 @@ public class CrimeMap extends JPanel
 	        g.setColor(Color.RED);
 	        for (MapMarker marker : markers) 
 	        {
+	        	marker.setImageCoordinates();
 	        	g.fillOval(marker.getX(), marker.getY(), 10, 10);
 	        }
         }

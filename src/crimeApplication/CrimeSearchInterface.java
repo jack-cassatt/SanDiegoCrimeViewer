@@ -148,7 +148,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		// Create panel for map and date
 		JPanel mapDatePanel = new JPanel();
 		mapDatePanel.setLayout(new BoxLayout(mapDatePanel, BoxLayout.Y_AXIS));
-		mapDatePanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+		mapDatePanel.setBorder(BorderFactory.createEmptyBorder(10, 50, 10, 50));
 		
 		// Create date panel
 		JPanel datePanel = new JPanel();
@@ -259,20 +259,20 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		searchButton.addActionListener(new SearchButtonListener(this, crimeMap));
 		searchPanel.add(searchButton);
 		
-		// Add crime panel to frame
-		JPanel crimePanel = new JPanel();
-		crimePanel.setLayout(new BoxLayout(crimePanel, BoxLayout.X_AXIS));
-		crimePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		crimePanel.setPreferredSize(new Dimension(200, 90));
+		// Add crime details panel to frame
+		JPanel crimeDetailsPanel = new JPanel();
+		crimeDetailsPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		crimeDetailsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		crimeDetailsPanel.setPreferredSize(new Dimension(200, 90));
 		crimeText = new JTextArea();
 		crimeText.setEditable(false);
 		crimeText.setBackground(null);
-		crimePanel.add(crimeText);
-		this.add(crimePanel, BorderLayout.SOUTH);
+		// Add crime text to center of crime panel
+		crimeDetailsPanel.add(crimeText);
+		this.add(crimeDetailsPanel, BorderLayout.SOUTH);
 		
 	
 		this.setVisible(true);
-		
 	}
 	
 	/**
@@ -363,7 +363,9 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 	 */
 	private LocalDateTime parseDate(String date)
 	{
+		// Split the date string by "/"
 		String[] dateParts = date.split("/");
+		// If the date is not in the correct format, show an error message
 		try
 		{
 			return LocalDateTime.of(Integer.parseInt(dateParts[2]),
@@ -372,34 +374,52 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		}
 		catch (Exception e)
 		{
-			JOptionPane.showMessageDialog(this, "Invalid date format:" + date);
 			return null;
 		}
 	}
 	
-	public void displayCrime(Crime crime)
+	/**
+	 * Purpose: Display the crime details in the text area below the map
+	 * @param crime
+	 */
+	public void displayCrimeDetails(Crime crime)
 	{
-		crimeText.setText("Date: " + crime.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + "\n"
-                + "Case ID: " + crime.getCaseID() + "\n"
-                + "Category: " + crime.getCategory() + "\n"
-                + "Description: " + crime.getDescription());
-				
-
+		// If no crime is selected, set text to empty
+		if (crime == null)
+		{
+			crimeText.setText("");
+		}
+		// Otherwise, display the crime details
+		else
+		{
+			crimeText.setText("Date: " + crime.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + "   "
+	                + "Case ID: " + crime.getCaseID() + "   "
+	                + "Category: " + crime.getCategory() + "   "
+	                + "Description: " + crime.getDescription());
+		}
 	}
 	
 	public static void main(String[] args)
 	{
+		// Create a new CrimeSearchInterface window
 		new CrimeSearchInterface();
 	}
 	
 	/*
-	 * Purpose: Listener for the date fields to validate the date
+	 * Purpose: Listener for the date fields to validate the date and show error if invalid
 	 */
 	public class DateFieldListener implements DocumentListener //, FocusListener
 	{
+		// Date field and error label
 		JTextField dateField;
 		JLabel errorLabel;
 		
+		/**
+		 * Constructor
+		 * 
+		 * @param dateField
+		 * @param errorLabel
+		 */
 		public DateFieldListener(JTextField dateField, JLabel errorLabel)
 		{
 			this.dateField = dateField;
@@ -428,7 +448,9 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		 * Purpose: Validate the date in the text field and show error if invalid
 		 */
 		private void validateDate()
-		{		
+		{	
+			// Reset error label
+			errorLabel.setText("MM/DD/YYYY");
 			// If the date is longer than 10 characters, show error
 			if (dateField.getText().length() > 10)
 			{
@@ -506,13 +528,9 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 				{
 					int year = Integer.parseInt(dateParts[2]);
 					// Do not show error if user is still entering date
-					if (dateParts[2].length() < 4)
+					if (year < 2020 || year > 2024)
 					{
-						dateField.setForeground(Color.BLACK);
-						errorLabel.setVisible(false);
-					}
-					else if (year < 2000 || year > 2024)
-					{
+						errorLabel.setText("Must be 2020 - 2024");
 						dateField.setForeground(Color.RED);
 						errorLabel.setVisible(true);
 						return;
@@ -533,12 +551,20 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		}
 	}
 
+	/**
+	 * Purpose: Perform action when zoom button is clicked
+	 * 
+	 * @param e
+	 */
+	@Override
 	public void actionPerformed(ActionEvent e)
 	{
+		// If zoom in button is clicked, increase panel height by 50
 		if (e.getSource() == zoomInButton)
 		{
 			crimeMap.zoom(50);
 		}
+		// If zoom out button is clicked, decrease panel height by 50
 		else if (e.getSource() == zoomOutButton)
 		{
 			crimeMap.zoom(-50);

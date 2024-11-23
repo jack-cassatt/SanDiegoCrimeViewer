@@ -30,10 +30,7 @@ public class MapMarker
 	public MapMarker(Crime crime, CrimeMap map)
 	{
 		this.crime = crime;
-		this.map = map;
-		// Calculate the x and y coordinates based on the latitude and longitude
-		setImageCoordinates();
-		
+		this.map = map;		
 	}
 	
 	/**
