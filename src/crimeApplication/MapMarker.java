@@ -4,8 +4,6 @@ package crimeApplication;
  * Lead Author(s):
  * @author Jack Cassatt
  * 
- * References:
- * 
  * Version/date: v.1 01NOV2024
  * 
  * Responsibilities of class:

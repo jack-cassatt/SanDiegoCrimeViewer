@@ -135,7 +135,6 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setForeground(Color.CYAN);
-		//this.setResizable(false);
 		this.setLayout(new BorderLayout());
 		
 		// Create a panel for the title
@@ -154,7 +153,8 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new GridLayout(2, 6, 10, 7));
 		datePanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 10));
-		// Create Labels for date fields to show error
+		
+		// Create Labels for date fields and to show error
 		JLabel startDateLabel = new JLabel("Start Date:");
 		startDateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		JLabel startDateErrorLabel = new JLabel("MM/DD/YYYY");
@@ -165,6 +165,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		JLabel endDateErrorLabel = new JLabel("MM/DD/YYYY");
 		endDateErrorLabel.setForeground(Color.RED);
 		endDateErrorLabel.setVisible(false);
+		
 		// Create text fields for start and end date
 		startDateField = new JTextField("01/01/2022");
 		startDateField.setColumns(11);
@@ -174,7 +175,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		// Add document listener to date fields
 		startDateField.getDocument().addDocumentListener(new DateFieldListener(startDateField, startDateErrorLabel));
 		endDateField.getDocument().addDocumentListener(new DateFieldListener(endDateField, endDateErrorLabel));
-		// Add labels and fields to date panel
+
 		// Create zoom panel
 		JPanel zoomPanel = new JPanel();
 		zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
@@ -184,6 +185,8 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		zoomOutButton.addActionListener(this);
 		zoomPanel.add(zoomOutButton);
 		zoomPanel.add(zoomInButton);
+		
+		// Add labels, fields, and buttons to date panel
 		datePanel.add(new JLabel());
 		datePanel.add(new JLabel());
 		datePanel.add(startDateErrorLabel);
@@ -196,33 +199,31 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		datePanel.add(endDateLabel);
 		datePanel.add(endDateField);
 		datePanel.add(new JLabel());
+		
 		// Add date panel to map date panel
 		mapDatePanel.add(datePanel);
 		
-		// Add map panel to map date panel
+		// Add map panel in scrollpane to map date panel
 		crimeMap = new CrimeMap(this);
 		JScrollPane crimeMapScrollPane = new JScrollPane(crimeMap);
 		crimeMapScrollPane.setPreferredSize(crimeMap.getPreferredSize(500));
 		crimeMapScrollPane.setViewportView(crimeMap);
-		JScrollBar mapVerticalScrollSpeed = crimeMapScrollPane.getVerticalScrollBar();
-		mapVerticalScrollSpeed.setUnitIncrement(16);
-		JScrollBar mapHorizontalScrollSpeed = crimeMapScrollPane.getHorizontalScrollBar();
-		mapHorizontalScrollSpeed.setUnitIncrement(16);
+		crimeMapScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		crimeMapScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
 		mapDatePanel.add(crimeMapScrollPane);
+		
 		// Add map date panel to frame
 		this.add(mapDatePanel, BorderLayout.CENTER);
 		
 		// Create panel for search options
 		JPanel searchPanel = new JPanel();
-		// Add space border to search panel
 		searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
 		// Scroll pane for crime categories
 		JScrollPane crimeCategoryScrollPane = new JScrollPane();
 		crimeCategoryScrollPane.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 20));
 		crimeCategoryScrollPane.setPreferredSize(new Dimension(180, 170));
-		JScrollBar crimeScrollSpeed = crimeCategoryScrollPane.getVerticalScrollBar();
-		crimeScrollSpeed.setUnitIncrement(16);
+		crimeCategoryScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		// Add crime category check boxes to the scroll pane
 		JPanel crimeCategoryPanel = new JPanel();
 		crimeCategoryPanel.setLayout(new BoxLayout(crimeCategoryPanel, BoxLayout.Y_AXIS));
@@ -232,15 +233,13 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 			crimeCategoryPanel.add(checkBox);
 		}
 		crimeCategoryScrollPane.setViewportView(crimeCategoryPanel);
-		// Add crime category scroll pane to search panel
 		searchPanel.add(crimeCategoryScrollPane);
 		
 		// Scroll pane for area codes
 		JScrollPane areaCodeScrollPane = new JScrollPane(); 
 		areaCodeScrollPane.setPreferredSize(new Dimension(150, 170));
 		areaCodeScrollPane.setBorder(BorderFactory.createEmptyBorder(50, 0, 20, 20));
-		JScrollBar areaCodeScrollSpeed = areaCodeScrollPane.getVerticalScrollBar();
-		areaCodeScrollSpeed.setUnitIncrement(16);
+		areaCodeScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		// Add area code check boxes to the scroll pane
 		JPanel areaCodePanel = new JPanel();
 		areaCodePanel.setLayout(new BoxLayout(areaCodePanel, BoxLayout.Y_AXIS));
@@ -251,6 +250,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		}
 		areaCodeScrollPane.setViewportView(areaCodePanel);
 		searchPanel.add(areaCodeScrollPane);
+		
 		// Add search panel to frame
 		this.add(searchPanel, BorderLayout.EAST);
 		
@@ -270,7 +270,6 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 		// Add crime text to center of crime panel
 		crimeDetailsPanel.add(crimeText);
 		this.add(crimeDetailsPanel, BorderLayout.SOUTH);
-		
 	
 		this.setVisible(true);
 	}
@@ -314,6 +313,7 @@ public class CrimeSearchInterface extends JFrame implements ActionListener
 	{
 		// Create a list to hold the selected area codes
 		List<Integer> selectedAreaCodes = new ArrayList<Integer>();
+		
 		// If the "All Area Codes" checkbox is selected, add 0 to the list and return
 		if (areaCodeCheckBoxes[0].isSelected())
 		{

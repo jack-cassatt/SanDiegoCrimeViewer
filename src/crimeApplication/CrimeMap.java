@@ -36,6 +36,7 @@ import java.awt.event.*;
  */
 public class CrimeMap extends JPanel
 {
+	// Instance variables
 	CrimeSearchInterface frame;
 	private ArrayList<MapMarker> markers;
 	private ArrayList<Crime> crimes;
@@ -59,23 +60,24 @@ public class CrimeMap extends JPanel
 	public CrimeMap(CrimeSearchInterface frame)
 	{
 		this.frame = frame;
-		this.setLayout(new BorderLayout());
 		markers = new ArrayList<MapMarker>();
-		setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
-	    // Load the map image
+		
+		// Load the map image
 		try {
             // Load the image as a BufferedImage
             mapImage = ImageIO.read(new File("map.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-		this.setPreferredSize(getPreferredSize(500));
 		
+		// Set the preferred size/dimension of the panel
+		this.setPreferredSize(getPreferredSize(500));
+	
 		// Add mouse listener for marker clicks
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                displayCrime(e.getX(), e.getY());
+                displayCrimeInformation(e.getX(), e.getY());
             }
         });
 	}
@@ -96,8 +98,13 @@ public class CrimeMap extends JPanel
 	 */
 	public Dimension getPreferredSize(int panelHeight)
     {
+		// Set the panel height
         this.panelHeight = panelHeight;
+        
+        // Calculate the panel width based on the aspect ratio
         int panelWidth = (int) (panelHeight / IMAGE_RATIO);
+        
+        // Return the new dimension
         return new Dimension(panelWidth, panelHeight);
     }
 	
@@ -112,8 +119,7 @@ public class CrimeMap extends JPanel
 		// If crimes are not null, add markers
 		if (crimes != null)
 		{
-			// If markers are empty (new search), add markers
-			// DisplayCrimes is also called on zoom, so we do not want to add markers again
+			// Create new markers if the list is empty
 			if (markers.isEmpty())
 			{
 				for (Crime crime : crimes)
@@ -122,42 +128,17 @@ public class CrimeMap extends JPanel
 					markers.add(marker);
 				}
 			}
-			// Set the image coordinates for each marker after the panel is resized
+			// Wait for panel to be finalized before updating marker coordinates
 			SwingUtilities.invokeLater(() -> 
 			{
 	            for (MapMarker marker : markers) 
 	            {
-	                marker.setImageCoordinates(); // Update coordinates based on finalized dimensions
+	            	// Update coordinates based on finalized dimensions
+	                marker.setImageCoordinates(); 
 	            }
 	        });
 			repaint();
 		}
-	}
-	
-	/**
-	 * Purpose: Get the width of the image
-	 * @return width
-	 */
-	public int getImageWidth()
-	{
-		double panelRatio = this.getHeight() / (double) this.getWidth();
-		if (panelRatio > IMAGE_RATIO)
-		{
-			return this.getWidth();
-		}
-		else
-		{
-			return (int) (this.getWidth() * IMAGE_RATIO);
-		}
-	}
-
-	/**
-	 * Purpose: Get the height of the image
-	 * @return height
-	 */
-	public int getImageHeight()
-	{
-		return (int) (getImageWidth() * IMAGE_RATIO);
 	}
 	
 	/**
@@ -231,7 +212,7 @@ public class CrimeMap extends JPanel
 	 * @param mouseX
 	 * @param mouseY
 	 */
-	protected void displayCrime(int mouseX, int mouseY) 
+	public void displayCrimeInformation(int mouseX, int mouseY) 
 	{
 		// Check if a marker was clicked
         for (MapMarker marker : markers) 

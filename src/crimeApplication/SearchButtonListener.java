@@ -20,10 +20,16 @@ import javax.swing.JOptionPane;
  */
 public class SearchButtonListener implements ActionListener
 {
+	// Instance variables
 	CrimeSearchInterface searchInterface;
-	SearchCriteria searchCriteria;
 	CrimeMap map;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param searchInterface
+	 * @param map
+	 */
 	public SearchButtonListener(CrimeSearchInterface searchInterface,
 			CrimeMap map)
 	{
@@ -31,12 +37,18 @@ public class SearchButtonListener implements ActionListener
 		this.map = map;
 	}
 	
+	/**
+	 * Purpose: Perform the search when the search button is clicked
+	 * 
+	 * @param e
+	 */
 	public void actionPerformed(ActionEvent e)
     {
 		// Clear the map
 		map.clearMap();
 		searchInterface.displayCrimeDetails(null);
-		// Get the search criteria
+		
+		// Get the search criteria and create a search criteria object
 		LocalDateTime startDate = searchInterface.getStartDate();
 		LocalDateTime endDate = searchInterface.getEndDate();
 		// Check if the date range is valid
@@ -48,8 +60,12 @@ public class SearchButtonListener implements ActionListener
 		List<String> selectedCategories = searchInterface.getCrimeCategories();
 		List<Integer> areaCodes = searchInterface.getAreaCodes();
 		SearchCriteria searchCriteria = new SearchCriteria(startDate, endDate, selectedCategories, areaCodes);
+		
+		// Create a parser and search for crimes
 		CSVCrimeDataParser parser = new CSVCrimeDataParser();
 		ArrayList<Crime> crimes = parser.searchCrimes(searchCriteria);
+		
+		// Display the crimes on the map
 		map.displayCrimes(crimes);
     }
 }

@@ -55,10 +55,7 @@ public class CSVCrimeDataParser
 			// Skip the first line and loop through CSV file
 			reader.readLine();
 			while ((line = reader.readLine()) != null)
-			{
-				// Create a string to hold the raw data
-				String crimeLine = line;
-				
+			{				
 				// Create array of string holding values in line separated by comma
 				String[] fields = line.split(",");
 				
@@ -126,7 +123,7 @@ public class CSVCrimeDataParser
 				}
 				
 				// Create a new crime object
-				Crime crime = new Crime(crimeLine, caseID, date, category, description, areaCode,
+				Crime crime = new Crime(line, caseID, date, category, description, areaCode,
 						latitude, longitude);
 				
 				// Check if the crime matches the search criteria
